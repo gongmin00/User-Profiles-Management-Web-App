@@ -1,15 +1,4 @@
 # umi project
+User Profiles Management App
 
-## Getting Started
-
-Install dependencies,
-
-```bash
-$ yarn
-```
-
-Start the dev server,
-
-```bash
-$ yarn start
-```
+A user profile management app using Umi.js framework
