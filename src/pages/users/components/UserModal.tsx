@@ -6,7 +6,11 @@ const UserModal = (props) => {
   const [form] = Form.useForm();
   //useForm is react hook only for functional component
   useEffect(() => {
-    form.setFieldsValue(props.recordData);
+    if (props.recordData === undefined) {
+      form.resetFields();
+    } else {
+      form.setFieldsValue(props.recordData);
+    }
   }, [props.modalVisible]);
   const formOnOk = () => {
     form.submit();

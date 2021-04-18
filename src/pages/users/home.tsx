@@ -1,4 +1,4 @@
-import { Table, Space } from 'antd';
+import { Table, Space, Button } from 'antd';
 import { connect } from 'umi';
 import UserModal from './components/UserModal';
 import { useState } from 'react';
@@ -8,25 +8,41 @@ const IndexPage = (props) => {
   const closeHandler = () => {
     setVisible(false);
   };
-
+  const addHandler = () => {
+    setVisible(true);
+    setRecord(undefined);
+  };
   const editHandler = (record) => {
     setVisible(true);
     setRecord(record);
   };
-
-  const finishEdit = (values) => {
-    setVisible(false);
+  const DeleteHandler = (record) => {
     props.dispatch({
-      type: 'users/edit',
-      payload: {
-        values,
-        recordData,
-      },
+      type: 'users/delete',
+      payload: record,
     });
   };
 
+  const finishEdit = (values) => {
+    if (recordData != undefined) {
+      props.dispatch({
+        type: 'users/edit',
+        payload: {
+          values,
+          recordData,
+        },
+      });
+    } else {
+      props.dispatch({
+        type: 'users/add',
+        payload: values,
+      });
+    }
+    setVisible(false);
+  };
+
   //values here is provided by ant design Form component
-  //recordData from table
+  //recordData from table record, has ID property
   const column = [
     {
       title: 'ID',
@@ -69,7 +85,13 @@ const IndexPage = (props) => {
           >
             Edit
           </a>
-          <a>Delete</a>
+          <a
+            onClick={() => {
+              DeleteHandler(record);
+            }}
+          >
+            Delete
+          </a>
         </Space>
       ),
     },
@@ -78,19 +100,29 @@ const IndexPage = (props) => {
   return (
     <div>
       <h1>users index page</h1>
+      <Button type="primary" onClick={addHandler}>
+        Add New
+      </Button>
       <UserModal
         modalVisible={modalVisible}
         closeHandler={closeHandler}
         recordData={recordData}
         finishEdit={finishEdit}
       ></UserModal>
-      <Table columns={column} dataSource={props.userData.data} rowKey="id" />
+      <Table
+        columns={column}
+        dataSource={props.userData.data}
+        rowKey="id"
+        loading={props.loading}
+      />
     </div>
   );
 };
 const mapStateToProps = (state) => {
+  console.log('loading', state);
   return {
     userData: state.users,
+    loading: state.loading.models.users,
   };
 };
 // const mapDispatchToProps = (dispatch) => {

@@ -1,5 +1,10 @@
 import { Reducer, Effect, Subscription } from 'umi';
-import { getRemoteList, editRemoteList } from './service';
+import {
+  getRemoteList,
+  editRemoteList,
+  deleteRemoteList,
+  addRemoteItem,
+} from './service';
 interface userModelType {
   namespace: 'users';
   state: {};
@@ -9,6 +14,8 @@ interface userModelType {
   effects: {
     getRemote: Effect;
     edit: Effect;
+    delete: Effect;
+    add: Effect;
   };
   subscriptions: {
     setup: Subscription;
@@ -20,6 +27,7 @@ const userModel: userModelType = {
   state: {},
   reducers: {
     getList(state, action) {
+      console.log(action.payload);
       return action.payload;
     },
   },
@@ -39,7 +47,25 @@ const userModel: userModelType = {
       const id = action.payload.recordData.id;
       const values = action.payload.values;
       const data = yield effects.call(editRemoteList, { values, id });
-      console.log('data from edit', data);
+      yield effects.put({
+        type: 'getRemote',
+      });
+      //刷新页面
+    },
+    *delete(action, effects) {
+      const id = action.payload.id;
+      yield effects.call(deleteRemoteList, { id });
+      yield effects.put({
+        type: 'getRemote',
+      });
+      //刷新页面
+    },
+    *add(action, effects) {
+      const values = action.payload;
+      yield effects.call(addRemoteItem, { values });
+      yield effects.put({
+        type: 'getRemote',
+      });
     },
   },
   subscriptions: {
