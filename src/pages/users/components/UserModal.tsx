@@ -1,30 +1,55 @@
-import { Modal, Form, Input } from 'antd';
+import { Modal, Form, Input, message } from 'antd';
 import userModel from '../model';
-import { useEffect } from 'react';
+import { useEffect, FC } from 'react';
+import { singleDataType } from '../data';
 
-const UserModal = (props) => {
+interface UserModalType {
+  recordData: singleDataType | undefined;
+  modalVisible: boolean;
+  closeHandler: () => void;
+  finishEdit: (values: any) => void;
+}
+
+const UserModal: FC<UserModalType> = (props) => {
+  const { recordData, modalVisible, closeHandler, finishEdit } = props;
   const [form] = Form.useForm();
   //useForm is react hook only for functional component
+  const failHandler = (error: any) => {
+    message.error(error.errorFields[0].errors[0]);
+  };
   useEffect(() => {
-    if (props.recordData === undefined) {
+    if (recordData === undefined) {
       form.resetFields();
     } else {
-      form.setFieldsValue(props.recordData);
+      form.setFieldsValue(recordData);
     }
-  }, [props.modalVisible]);
+  }, [modalVisible]);
   const formOnOk = () => {
     form.submit();
   };
   return (
     <Modal
       title="User Modal"
-      visible={props.modalVisible}
+      visible={modalVisible}
       onOk={formOnOk}
-      onCancel={props.closeHandler}
+      onCancel={closeHandler}
       forceRender
     >
-      <Form name="user form" form={form} onFinish={props.finishEdit}>
-        <Form.Item name="name" label="Name">
+      <Form
+        name="user form"
+        form={form}
+        onFinishFailed={failHandler}
+        onFinish={finishEdit}
+      >
+        <Form.Item
+          name="name"
+          label="Name"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
           <Input></Input>
         </Form.Item>
         <Form.Item name="email" label="E-mail">

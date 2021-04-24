@@ -5,11 +5,22 @@ import {
   deleteRemoteList,
   addRemoteItem,
 } from './service';
+import { singleDataType } from './data';
+
+export interface userStateType {
+  data: singleDataType[];
+  meta: {
+    total: number;
+    per_page: number;
+    page: number;
+  };
+}
 interface userModelType {
   namespace: 'users';
-  state: {};
+  state: userStateType;
   reducers: {
-    getList: Reducer;
+    getList: Reducer<userStateType>;
+    //这里是泛型
   };
   effects: {
     getRemote: Effect;
@@ -24,7 +35,14 @@ interface userModelType {
 
 const userModel: userModelType = {
   namespace: 'users',
-  state: {},
+  state: {
+    data: [],
+    meta: {
+      total: 0,
+      per_page: 10,
+      page: 1,
+    },
+  },
   reducers: {
     getList(state, action) {
       console.log(action.payload);

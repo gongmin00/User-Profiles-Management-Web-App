@@ -6,7 +6,7 @@ export default defineConfig({
   },
   routes: [
     { path: '/', component: '@/pages/index' },
-    { path: '/users', component: '@/pages/users/home' },
+    { path: '/users', component: '@/pages/users/usersList' },
   ],
   // cssLoaderOtions: {
   //   localIdentName: '[local]',

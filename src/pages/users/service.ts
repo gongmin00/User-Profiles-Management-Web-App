@@ -1,7 +1,7 @@
 import request, { extend } from 'umi-request';
 import { message } from 'antd';
 
-const errorHandler = (error) => {
+const errorHandler = (error: any) => {
   if (error.response.status > 400) {
     message.error(error.data.message ? error.data.message : error.data);
   } else {
@@ -22,7 +22,7 @@ export const getRemoteList = async () => {
   return reqData;
 };
 
-export const addRemoteItem = async ({ values }) => {
+export const addRemoteItem = async ({ values }: { values: any }) => {
   console.log('touch service', values);
   const newData = extendRequest(
     `http://public-api-v1.aspirantzhang.com/users`,
@@ -35,7 +35,13 @@ export const addRemoteItem = async ({ values }) => {
     .catch((error) => message.error('falied to add new item'));
   return newData;
 };
-export const editRemoteList = async ({ values, id }) => {
+export const editRemoteList = async ({
+  values,
+  id,
+}: {
+  values: any;
+  id: number;
+}) => {
   const reqData = extendRequest(
     `http://public-api-v1.aspirantzhang.com/users/${id}`,
     {
@@ -48,7 +54,7 @@ export const editRemoteList = async ({ values, id }) => {
   return reqData;
 };
 
-export const deleteRemoteList = async ({ id }) => {
+export const deleteRemoteList = async ({ id }: { id: number }) => {
   const deleData = extendRequest(
     `http://public-api-v1.aspirantzhang.com/users/${id}`,
     {

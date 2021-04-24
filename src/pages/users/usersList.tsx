@@ -1,10 +1,21 @@
 import { Table, Space, Button } from 'antd';
-import { connect } from 'umi';
+import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
+import { connect, Dispatch, Loading, userStateType } from 'umi';
 import UserModal from './components/UserModal';
-import { useState } from 'react';
-const IndexPage = (props) => {
+import { useState, FC } from 'react';
+import { singleDataType } from './data';
+interface UserListType {
+  userData: userStateType;
+  dispatch: Dispatch;
+  userListLoading: boolean;
+}
+const usersList: FC<UserListType> = ({
+  userData,
+  dispatch,
+  userListLoading,
+}) => {
   const [modalVisible, setVisible] = useState(false);
-  const [recordData, setRecord] = useState();
+  const [recordData, setRecord] = useState<singleDataType | undefined>();
   const closeHandler = () => {
     setVisible(false);
   };
@@ -12,20 +23,20 @@ const IndexPage = (props) => {
     setVisible(true);
     setRecord(undefined);
   };
-  const editHandler = (record) => {
+  const editHandler = (record: singleDataType) => {
     setVisible(true);
     setRecord(record);
   };
-  const DeleteHandler = (record) => {
-    props.dispatch({
+  const DeleteHandler = (record: singleDataType) => {
+    dispatch({
       type: 'users/delete',
       payload: record,
     });
   };
 
-  const finishEdit = (values) => {
+  const finishEdit = (values: any) => {
     if (recordData != undefined) {
-      props.dispatch({
+      dispatch({
         type: 'users/edit',
         payload: {
           values,
@@ -33,7 +44,7 @@ const IndexPage = (props) => {
         },
       });
     } else {
-      props.dispatch({
+      dispatch({
         type: 'users/add',
         payload: values,
       });
@@ -76,7 +87,7 @@ const IndexPage = (props) => {
       //     <a>Delete</a>
       //   </Space>;
       // },
-      render: (text, record) => (
+      render: (text: string, record: singleDataType) => (
         <Space>
           <a
             onClick={() => {
@@ -109,20 +120,25 @@ const IndexPage = (props) => {
         recordData={recordData}
         finishEdit={finishEdit}
       ></UserModal>
-      <Table
+      <ProTable
         columns={column}
-        dataSource={props.userData.data}
+        dataSource={userData.data}
         rowKey="id"
-        loading={props.loading}
+        loading={userListLoading}
       />
     </div>
   );
 };
-const mapStateToProps = (state) => {
-  console.log('loading', state);
+const mapStateToProps = ({
+  users,
+  loading,
+}: {
+  users: userStateType;
+  loading: Loading;
+}) => {
   return {
-    userData: state.users,
-    loading: state.loading.models.users,
+    userData: users,
+    userListLoading: loading.models.users,
   };
 };
 // const mapDispatchToProps = (dispatch) => {
@@ -135,4 +151,4 @@ const mapStateToProps = (state) => {
 //   };
 // };
 
-export default connect(mapStateToProps)(IndexPage);
+export default connect(mapStateToProps)(usersList);
