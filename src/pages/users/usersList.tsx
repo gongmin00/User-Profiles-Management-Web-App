@@ -4,6 +4,8 @@ import { connect, Dispatch, Loading, userStateType } from 'umi';
 import UserModal from './components/UserModal';
 import { useState, FC } from 'react';
 import { singleDataType } from './data';
+import { getRemoteList } from './service';
+
 interface UserListType {
   userData: userStateType;
   dispatch: Dispatch;
@@ -54,6 +56,24 @@ const usersList: FC<UserListType> = ({
 
   //values here is provided by ant design Form component
   //recordData from table record, has ID property
+
+  const proTableHandler = async ({
+    pageSize,
+    current,
+  }: {
+    pageSize: number;
+    current: number;
+  }) => {
+    const usersList = await getRemoteList({
+      page: current,
+      per_page: pageSize,
+    });
+    return {
+      data: usersList.data,
+      success: true,
+      total: usersList.meta.total,
+    };
+  };
   const column = [
     {
       title: 'ID',
@@ -121,10 +141,12 @@ const usersList: FC<UserListType> = ({
         finishEdit={finishEdit}
       ></UserModal>
       <ProTable
+        request={proTableHandler}
         columns={column}
-        dataSource={userData.data}
+        // dataSource={userData.data}
         rowKey="id"
         loading={userListLoading}
+        search={false}
       />
     </div>
   );

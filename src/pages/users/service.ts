@@ -3,6 +3,7 @@ import { message } from 'antd';
 
 const errorHandler = (error: any) => {
   if (error.response.status > 400) {
+    console.log(error.data.message, error.data);
     message.error(error.data.message ? error.data.message : error.data);
   } else {
     message.error('network error');
@@ -10,9 +11,16 @@ const errorHandler = (error: any) => {
 };
 const extendRequest = extend({ errorHandler });
 
-export const getRemoteList = async () => {
+export const getRemoteList = async ({
+  page,
+  per_page,
+}: {
+  page: number;
+  per_page: number;
+}) => {
+  console.log('page&per_page', page, per_page);
   const reqData = extendRequest(
-    'http://public-api-v1.aspirantzhang.com/users',
+    `http://public-api-v1.aspirantzhang.com/users?page=${page}&per_page=${per_page}`,
     {
       method: 'get',
     },

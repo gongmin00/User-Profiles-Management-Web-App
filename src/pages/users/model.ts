@@ -45,14 +45,17 @@ const userModel: userModelType = {
   },
   reducers: {
     getList(state, action) {
-      console.log(action.payload);
+      console.log('reducer');
       return action.payload;
     },
   },
   effects: {
     *getRemote(action, effects) {
-      const data = yield effects.call(getRemoteList);
-      console.log(data);
+      const metaData = yield effects.select((state) => state.users.meta);
+      const page = metaData.page;
+      const per_page = metaData.per_page;
+      const data = yield effects.call(getRemoteList, { page, per_page });
+      console.log('getRemote', data, page, per_page);
       yield effects.put({
         type: 'getList',
         payload: data,
@@ -73,8 +76,13 @@ const userModel: userModelType = {
     *delete(action, effects) {
       const id = action.payload.id;
       yield effects.call(deleteRemoteList, { id });
+
       yield effects.put({
         type: 'getRemote',
+        // payload: {
+        //   page: metaData.page,
+        //   per_page: metaData.per_page,
+        // },
       });
       //刷新页面
     },
@@ -90,9 +98,10 @@ const userModel: userModelType = {
     setup({ dispatch, history }) {
       history.listen((location, action) => {
         if (location.pathname === '/users') {
-          dispatch({
-            type: 'getRemote',
-          });
+          console.log('subscription');
+          // dispatch({
+          //   type: 'getRemote',
+          // });
         }
       });
     },
