@@ -1,4 +1,4 @@
-import { Table, Space, Button } from 'antd';
+import { Table, Space, Button, Pagination } from 'antd';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 import { connect, Dispatch, Loading, userStateType } from 'umi';
 import UserModal from './components/UserModal';
@@ -53,27 +53,44 @@ const usersList: FC<UserListType> = ({
     }
     setVisible(false);
   };
-
+  const pageHandler = (page, pageSize) => {
+    dispatch({
+      type: 'users/getRemote',
+      payload: {
+        page,
+        per_page: pageSize,
+      },
+    });
+  };
+  const pageSizeHandler = (current, size) => {
+    dispatch({
+      type: 'users/getRemote',
+      payload: {
+        page: current,
+        per_page: size,
+      },
+    });
+  };
   //values here is provided by ant design Form component
   //recordData from table record, has ID property
 
-  const proTableHandler = async ({
-    pageSize,
-    current,
-  }: {
-    pageSize: number;
-    current: number;
-  }) => {
-    const usersList = await getRemoteList({
-      page: current,
-      per_page: pageSize,
-    });
-    return {
-      data: usersList.data,
-      success: true,
-      total: usersList.meta.total,
-    };
-  };
+  // const proTableHandler = async ({
+  //   pageSize,
+  //   current,
+  // }: {
+  //   pageSize: number;
+  //   current: number;
+  // }) => {
+  //   const usersList = await getRemoteList({
+  //     page: current,
+  //     per_page: pageSize,
+  //   });
+  //   return {
+  //     data: usersList.data,
+  //     success: true,
+  //     total: usersList.meta.total,
+  //   };
+  // };
   const column = [
     {
       title: 'ID',
@@ -141,16 +158,27 @@ const usersList: FC<UserListType> = ({
         finishEdit={finishEdit}
       ></UserModal>
       <ProTable
-        request={proTableHandler}
         columns={column}
-        // dataSource={userData.data}
+        dataSource={userData.data}
         rowKey="id"
         loading={userListLoading}
         search={false}
+        pagination={false}
+      />
+      <Pagination
+        total={userData.meta.total}
+        current={userData.meta.page}
+        onChange={pageHandler}
+        onShowSizeChange={pageSizeHandler}
+        pageSize={userData.meta.per_page}
+        showSizeChanger
+        showQuickJumper
+        showTotal={(total) => `Total ${total} items`}
       />
     </div>
   );
 };
+
 const mapStateToProps = ({
   users,
   loading,

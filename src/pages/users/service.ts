@@ -3,11 +3,11 @@ import { message } from 'antd';
 
 const errorHandler = (error: any) => {
   if (error.response.status > 400) {
-    console.log(error.data.message, error.data);
     message.error(error.data.message ? error.data.message : error.data);
   } else {
     message.error('network error');
   }
+  throw error;
 };
 const extendRequest = extend({ errorHandler });
 
@@ -18,7 +18,6 @@ export const getRemoteList = async ({
   page: number;
   per_page: number;
 }) => {
-  console.log('page&per_page', page, per_page);
   const reqData = extendRequest(
     `http://public-api-v1.aspirantzhang.com/users?page=${page}&per_page=${per_page}`,
     {
@@ -58,7 +57,7 @@ export const editRemoteList = async ({
     },
   )
     .then(message.success('success edit table item'))
-    .catch((error) => message.error('failed to edit item'));
+    .catch((error) => message.error('failed to edit table item'));
   return reqData;
 };
 
