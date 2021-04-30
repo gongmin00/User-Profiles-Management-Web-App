@@ -38,8 +38,8 @@ export const addRemoteItem = async ({ values }: { values: any }) => {
       data: values,
     },
   )
-    .then((response) => message.success('successed added table item'))
-    .catch((error) => message.error('falied to add new item'));
+    .then((response) => true)
+    .catch((error) => false);
   return newData;
 };
 export const editRemoteList = async ({
@@ -56,8 +56,8 @@ export const editRemoteList = async ({
       data: values,
     },
   )
-    .then(message.success('success edit table item'))
-    .catch((error) => message.error('failed to edit table item'));
+    .then((res) => true)
+    .catch((error) => false);
   return reqData;
 };
 

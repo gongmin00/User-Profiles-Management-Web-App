@@ -8,10 +8,17 @@ interface UserModalType {
   modalVisible: boolean;
   closeHandler: () => void;
   finishEdit: (values: any) => void;
+  confirmLoading: boolean;
 }
 
 const UserModal: FC<UserModalType> = (props) => {
-  const { recordData, modalVisible, closeHandler, finishEdit } = props;
+  const {
+    recordData,
+    modalVisible,
+    closeHandler,
+    finishEdit,
+    confirmLoading,
+  } = props;
   const [form] = Form.useForm();
   //useForm is react hook only for functional component
   const failHandler = (error: any) => {
@@ -34,6 +41,7 @@ const UserModal: FC<UserModalType> = (props) => {
       onOk={formOnOk}
       onCancel={closeHandler}
       forceRender
+      confirmLoading={confirmLoading}
     >
       <Form
         name="user form"

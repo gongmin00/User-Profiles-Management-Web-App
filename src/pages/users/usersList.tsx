@@ -1,10 +1,10 @@
-import { Table, Space, Button, Pagination } from 'antd';
+import { Table, Space, Button, Pagination, message } from 'antd';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 import { connect, Dispatch, Loading, userStateType } from 'umi';
 import UserModal from './components/UserModal';
 import { useState, FC } from 'react';
 import { singleDataType } from './data';
-import { getRemoteList } from './service';
+import { getRemoteList, editRemoteList, addRemoteItem } from './service';
 
 interface UserListType {
   userData: userStateType;
@@ -18,6 +18,7 @@ const usersList: FC<UserListType> = ({
 }) => {
   const [modalVisible, setVisible] = useState(false);
   const [recordData, setRecord] = useState<singleDataType | undefined>();
+  const [confirmLoadingValue, setComfirmLoading] = useState<boolean>(false);
   const closeHandler = () => {
     setVisible(false);
   };
@@ -36,22 +37,67 @@ const usersList: FC<UserListType> = ({
     });
   };
 
-  const finishEdit = (values: any) => {
+  const finishEdit = async (values: any) => {
+    setComfirmLoading(true);
+    let finishFun;
+    let id = 0;
     if (recordData != undefined) {
+      finishFun = editRemoteList;
+      id = recordData.id;
+    } else {
+      finishFun = addRemoteItem;
+    }
+    const result = await finishFun({ values, id });
+    if (result) {
+      message.success(`${recordData != undefined ? 'edit' : 'add'} successed`);
+      setVisible(false);
       dispatch({
-        type: 'users/edit',
+        type: 'users/getRemote',
         payload: {
-          values,
-          recordData,
+          page: userData.meta.page,
+          per_page: userData.meta.per_page,
         },
       });
+      setComfirmLoading(false);
     } else {
-      dispatch({
-        type: 'users/add',
-        payload: values,
-      });
+      message.error(`${recordData != undefined ? 'edit' : 'add'} failed`);
+      setComfirmLoading(false);
     }
-    setVisible(false);
+    // if (recordData != undefined) {
+    //   const id = recordData.id;
+    //   finishFun = editRemoteList
+    //   const editResult = await editRemoteList({ values, id });
+    //   if (editResult) {
+    //     setVisible(false);
+    //     message.success('successfully edit table');
+    //   } else {
+    //     message.error('failed to edit table');
+    //   }
+    // } else {
+    //   const addResult = await addRemoteItem({ values });
+    //   if (addResult) {
+    //     setVisible(false);
+    //     message.success('successfully add table item');
+    //   } else {
+    //     message.error('failed to add new item');
+    //   }
+    // }
+
+    // if (recordData != undefined) {
+    //   dispatch({
+    //     type: 'users/edit',
+    //     payload: {
+    //       values,
+    //       recordData,
+    //     },
+    //   });
+    // } else {
+    //   dispatch({
+    //     type: 'users/add',
+    //     payload: values,
+    //   });
+    // }
+    // setVisible(false);
   };
   const pageHandler = (page, pageSize) => {
     dispatch({
@@ -156,6 +202,7 @@ const usersList: FC<UserListType> = ({
         closeHandler={closeHandler}
         recordData={recordData}
         finishEdit={finishEdit}
+        confirmLoading={confirmLoadingValue}
       ></UserModal>
       <ProTable
         columns={column}

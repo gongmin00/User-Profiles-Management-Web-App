@@ -1,5 +1,5 @@
 export interface singleDataType {
-  id: string;
+  id: number;
   name: string;
   email: string;
   create_time: string;
