@@ -1,8 +1,8 @@
-import { Modal, Form, Input, message } from 'antd';
+import { Modal, Form, Input, message, DatePicker, Switch } from 'antd';
 import userModel from '../model';
 import { useEffect, FC } from 'react';
 import { singleDataType } from '../data';
-
+import moment from 'moment';
 interface UserModalType {
   recordData: singleDataType | undefined;
   modalVisible: boolean;
@@ -27,10 +27,21 @@ const UserModal: FC<UserModalType> = (props) => {
   useEffect(() => {
     if (recordData === undefined) {
       form.resetFields();
+      //when add new button is clicked
     } else {
-      form.setFieldsValue(recordData);
+      form.setFieldsValue({
+        ...recordData,
+        create_time: moment(recordData.create_time),
+        status: recordData.status === '1' ? true : false,
+      });
+      //when edit buttion is clicked,
+      //set time value before render into form, because form value is not working
     }
   }, [modalVisible]);
+  const formLayout = {
+    labelCol: { span: 6 },
+    wrapperCol: { span: 18 },
+  };
   const formOnOk = () => {
     form.submit();
   };
@@ -44,6 +55,7 @@ const UserModal: FC<UserModalType> = (props) => {
       confirmLoading={confirmLoading}
     >
       <Form
+        {...formLayout}
         name="user form"
         form={form}
         onFinishFailed={failHandler}
@@ -64,10 +76,11 @@ const UserModal: FC<UserModalType> = (props) => {
           <Input></Input>
         </Form.Item>
         <Form.Item name="create_time" label="Created Time">
-          <Input></Input>
+          {/* <Input></Input> */}
+          <DatePicker showTime />
         </Form.Item>
-        <Form.Item name="status" label="Status">
-          <Input></Input>
+        <Form.Item name="status" label="Status" valuePropName="checked">
+          <Switch />
         </Form.Item>
       </Form>
     </Modal>

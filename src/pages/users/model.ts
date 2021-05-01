@@ -65,7 +65,7 @@ const userModel: userModelType = {
       const values = action.payload.values;
       const data = yield effects.call(editRemoteList, { values, id });
       const { page, per_page } = yield effects.select(
-        (state) => state.users.meta,
+        (state: any) => state.users.meta,
       );
       yield effects.put({
         type: 'getRemote',
@@ -80,7 +80,7 @@ const userModel: userModelType = {
       const id = action.payload.id;
       yield effects.call(deleteRemoteList, { id });
       const { page, per_page } = yield effects.select(
-        (state) => state.users.meta,
+        (state: any) => state.users.meta,
       );
       yield effects.put({
         type: 'getRemote',
@@ -95,7 +95,7 @@ const userModel: userModelType = {
       const values = action.payload;
       yield effects.call(addRemoteItem, { values });
       const { page, per_page } = yield effects.select(
-        (state) => state.users.meta,
+        (state: any) => state.users.meta,
       );
       console.log('add', page, per_page);
       yield effects.put({

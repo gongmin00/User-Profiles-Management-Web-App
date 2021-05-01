@@ -1,5 +1,5 @@
 import { Table, Space, Button, Pagination, message } from 'antd';
-import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
+import ProTable, { ProColumns } from '@ant-design/pro-table';
 import { connect, Dispatch, Loading, userStateType } from 'umi';
 import UserModal from './components/UserModal';
 import { useState, FC } from 'react';
@@ -63,57 +63,31 @@ const usersList: FC<UserListType> = ({
       message.error(`${recordData != undefined ? 'edit' : 'add'} failed`);
       setComfirmLoading(false);
     }
-    // if (recordData != undefined) {
-    //   const id = recordData.id;
-    //   finishFun = editRemoteList
-    //   const editResult = await editRemoteList({ values, id });
-    //   if (editResult) {
-    //     setVisible(false);
-    //     message.success('successfully edit table');
-    //   } else {
-    //     message.error('failed to edit table');
-    //   }
-    // } else {
-    //   const addResult = await addRemoteItem({ values });
-    //   if (addResult) {
-    //     setVisible(false);
-    //     message.success('successfully add table item');
-    //   } else {
-    //     message.error('failed to add new item');
-    //   }
-    // }
-
-    // if (recordData != undefined) {
-    //   dispatch({
-    //     type: 'users/edit',
-    //     payload: {
-    //       values,
-    //       recordData,
-    //     },
-    //   });
-    // } else {
-    //   dispatch({
-    //     type: 'users/add',
-    //     payload: values,
-    //   });
-    // }
-    // setVisible(false);
   };
-  const pageHandler = (page, pageSize) => {
+  const pageHandler = (page: number, pageSize?: number) => {
     dispatch({
       type: 'users/getRemote',
       payload: {
         page,
-        per_page: pageSize,
+        per_page: pageSize ? pageSize : userData.meta.per_page,
       },
     });
   };
-  const pageSizeHandler = (current, size) => {
+  const pageSizeHandler = (current: number, size: number) => {
     dispatch({
       type: 'users/getRemote',
       payload: {
         page: current,
         per_page: size,
+      },
+    });
+  };
+  const reloadHandler = () => {
+    dispatch({
+      type: 'users/getRemote',
+      payload: {
+        page: userData.meta.page,
+        per_page: userData.meta.per_page,
       },
     });
   };
@@ -137,23 +111,32 @@ const usersList: FC<UserListType> = ({
   //     total: usersList.meta.total,
   //   };
   // };
-  const column = [
+  const column: ProColumns<singleDataType>[] = [
     {
       title: 'ID',
       //refers to table title display in front end
       dataIndex: 'id',
       //refers to keys data source
       key: 'Id',
+      valueType: 'text',
     },
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+      valueType: 'text',
     },
     {
       title: 'E-mail',
       dataIndex: 'email',
       key: 'email',
+      valueType: 'text',
+    },
+    {
+      title: 'Create-Time',
+      dataIndex: 'create_time',
+      key: 'create_time',
+      valueType: 'dateTime',
     },
     {
       title: 'Action',
@@ -170,7 +153,7 @@ const usersList: FC<UserListType> = ({
       //     <a>Delete</a>
       //   </Space>;
       // },
-      render: (text: string, record: singleDataType) => (
+      render: (text: any, record: singleDataType) => (
         <Space>
           <a
             onClick={() => {
@@ -194,9 +177,7 @@ const usersList: FC<UserListType> = ({
   return (
     <div>
       <h1>users index page</h1>
-      <Button type="primary" onClick={addHandler}>
-        Add New
-      </Button>
+
       <UserModal
         modalVisible={modalVisible}
         closeHandler={closeHandler}
@@ -211,6 +192,18 @@ const usersList: FC<UserListType> = ({
         loading={userListLoading}
         search={false}
         pagination={false}
+        options={{
+          density: true,
+          fullScreen: true,
+          reload: reloadHandler,
+          setting: true,
+        }}
+        headerTitle="User Profile Table"
+        toolBarRender={() => [
+          <Button type="primary" onClick={addHandler}>
+            Add New
+          </Button>,
+        ]}
       />
       <Pagination
         total={userData.meta.total}
